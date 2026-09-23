@@ -1,0 +1,30 @@
+# Automatically merged into docker-compose.yml by `docker compose` (no -f
+# needed) — this is what turns `docker compose up -d` into a live-reloading
+# dev setup instead of the "build once, run as-is" prod-style image
+# docker-compose.yml/Dockerfile describe on their own.
+#
+# It bind-mounts ./src over the copy baked into the image at build time, and
+# swaps each service's command for the `*:docker` scripts from package.json
+# (nodemon --legacy-watch), so editing src/ no longer requires
+# `docker compose up -d --build` — a rebuild is only needed again when
+# package.json/package-lock.json or the Dockerfile itself change.
+#
+# Plain node --watch (the `dev`/`worker` scripts used outside Docker) relies
+# on native filesystem change events, which Docker Desktop's bind mounts
+# (particularly on Windows/macOS) don't reliably forward into the
+# container — nodemon's --legacy-watch instead polls the filesystem, which
+# works regardless of the host OS or mount backend.
+services:
+  api:
+    command: ['npm', 'run', 'dev:docker']
+    volumes:
+      - ./src:/app/src
+    environment:
+      NODE_ENV: development
+
+  worker:
+    command: ['npm', 'run', 'worker:docker']
+    volumes:
+      - ./src:/app/src
+    environment:
+      NODE_ENV: development

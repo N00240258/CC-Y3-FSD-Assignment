@@ -1,0 +1,26 @@
+{
+  "name": "student-assignment-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal starter API — same architecture as the support desk case study (app.js/server.js split, worker as a separate process, Docker Compose infra), ready for you to build your own case study on top of.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "worker": "node --watch src/worker.js",
+    "worker:start": "node src/worker.js",
+    "dev:docker": "nodemon --legacy-watch --watch src src/server.js",
+    "worker:docker": "nodemon --legacy-watch --watch src src/worker.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "helmet": "^8.3.0",
+    "morgan": "^1.12.0",
+    "nodemon": "^3.1.7",
+    "zod": "^3.25.76"
+  }
+}

@@ -1,0 +1,72 @@
+# Same infrastructure and port layout as the support desk case study's
+# docker-compose.yml — mysql, mailpit (dev email), redis (job queue),
+# plus `api` and `worker` built from the same image. Nothing here is wired
+# into the app yet (the API only serves GET /welcome and the worker just
+# logs that it started), but it's ready for you to build your own case
+# study's database, events, and background jobs on top of.
+#
+# Assumes the support desk project isn't running at the same time — both
+# projects claim the same host ports (3306, 1025, 8025, 6379, 3000).
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: student_app
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - '1025:1025' # SMTP — nodemailer's transport target, once you add one
+      - '8025:8025' # web UI — http://localhost:8025
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - mailpit
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://root:root@mysql:3306/student_app
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  # Same image as `api`, same environment, different command — this is the
+  # separate worker process, kept in its own container from day one so
+  # adding a real job queue later is a code change, not an infra change.
+  worker:
+    build: .
+    command: ['node', 'src/worker.js']
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - mailpit
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://root:root@mysql:3306/student_app
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+volumes:
+  mysql-data:
