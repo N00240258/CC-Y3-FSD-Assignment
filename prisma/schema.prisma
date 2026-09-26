@@ -1,0 +1,113 @@
+// This Prisma schema was generated from SQL DDL
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql" // Change to "mysql", "sqlite", etc. as needed
+    url      = env("DATABASE_URL")
+}
+
+enum user_type {
+    user
+    admin
+}
+
+model User {
+    id          Int     @id @default(autoincrement())
+    username    String
+    email       String  @unique
+    password    String
+    user_type   user_type @default(user)
+    created_at  DateTime @default(now())
+
+    orders Order[]
+    reviews Review[]
+}
+
+model Movie {
+    id              Int      @id @default(autoincrement())
+    image           String
+    title           String
+    runtime         String
+    overview        String
+    rating          Decimal
+    price           Decimal
+    release_date    DateTime
+
+    movie_reviewing Review[]
+    genre Movie_genre[]
+    movie_directing Director[]
+    movie_ordered Order[]
+}
+
+model Genre {
+    id      Int      @id @default(autoincrement())
+    name    String
+
+    movie_genres Movie_genre[]
+}
+
+model Order {
+    id          Int      @id @default(autoincrement())
+    user_id     Int
+    order_time  DateTime
+
+    user User @relation("Orderer", fields: [user_id], references: [id])
+
+    ordered_movies Movie[]
+}
+
+model Director {
+    id              Int      @id @default(autoincrement())
+    image           String
+    name            String
+    date_of_birth   DateTime
+
+    directed_movies Movie_director[]
+}
+
+model Review {
+    id          Int     @id @default(autoincrement())
+    movie_id    Int     @unique
+    user_id     Int     @unique
+    review_text String
+    rating      String
+    created_at  DateTime
+    updated_at  DateTime
+
+    movie_reviewing Movie @relation("MovieReviewing", fields: [movie_id], references: [id])
+    user_reviewing User @relation("Reviewer", fields: [user_id], references: [id])
+}
+
+
+model Movie_order {
+    order_id Int
+    movie_id Int
+
+    movie_ordered Movie @relation(fields: [movie_id], references: [id])
+    order_number Order @relation(fields: [order_id], references: [id])
+
+    @@id([movie_id, order_id])
+}
+
+model Movie_director {
+    movie_id    Int
+    director_id Int
+
+    movie_directing Movie @relation(fields: [movie_id], references: [id])
+    movie_director Director @relation(fields: [director_id], references: [id])
+
+    @@id([movie_id, director_id])
+}
+
+model Movie_genre {
+    movie_id Int
+    genre_id Int
+
+    movie Movie @relation(fields: [movie_id], references: [id])
+    genre Genre @relation(fields: [genre_id], references: [id])
+
+    @@id([movie_id, genre_id])
+}
