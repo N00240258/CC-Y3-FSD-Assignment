@@ -1,8 +1,8 @@
 {
-  "name": "student-assignment-api",
+  "name": "support-desk-instructor",
   "version": "1.0.0",
   "private": true,
-  "description": "Minimal starter API — same architecture as the support desk case study (app.js/server.js split, worker as a separate process, Docker Compose infra), ready for you to build your own case study on top of.",
+  "description": "Support ticketing REST API — teaching case study for Full Stack Development (Back End weeks).",
   "type": "module",
   "main": "src/server.js",
   "scripts": {
@@ -10,28 +10,44 @@
     "dev": "node --watch src/server.js",
     "worker": "node --watch src/worker.js",
     "worker:start": "node src/worker.js",
-    "dev:docker": "nodemon --legacy-watch --watch src src/server.js",
-    "worker:docker": "nodemon --legacy-watch --watch src src/worker.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "build": "npm run build --prefix tutorial",
+    "tutorial:dev": "npm run dev --prefix tutorial",
+    "sync:public": "node scripts/sync-to-public.js",
+    "lesson:start": "node scripts/start-lesson.js",
+    "lesson:finish": "node scripts/finish-lesson.js",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio"
   },
+  "license": "UNLICENSED",
   "prisma": {
     "seed": "node prisma/seed.js"
   },
-  "license": "UNLICENSED",
   "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^6.3.4",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
     "helmet": "^8.3.0",
+    "ioredis": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
     "morgan": "^1.12.0",
-    "nodemon": "^3.1.7",
-    "zod": "^3.25.76",
-    "@prisma/client": "^6.19.3"
+    "nodemailer": "^10.0.2",
+    "socket.io": "^4.8.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "prisma": "^6.19.3"
+    "jest": "^30.5.1",
+    "prisma": "^6.19.3",
+    "socket.io-client": "^4.8.3",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

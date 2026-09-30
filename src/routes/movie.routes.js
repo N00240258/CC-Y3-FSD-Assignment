@@ -1,27 +1,29 @@
 import express from 'express';
 import asyncHandler from '../middleware/asyncHandler.js';
-import { getMovie } from '../controllers/movie.controller.js';
+import * as movieController from '../controllers/movie.controller.js';
 
 const router = express.Router();
 
-router.get('/', asyncHandler(getWelcome));
+router.get('/', movieController.getAllMovies);
+router.post('/', movieController.createMovie);
+router.get('/:id', movieController.getMovieById);
 
-router.post(
-    "/",
-    authorize("admin"),
-    validate({ body: createMovieSchema }),
-    movieController.createMovie,
-)
+// router.post(
+//     "/",
+//     authorize("admin"),
+//     validate({ body: createMovieSchema }),
+//     movieController.createMovie,
+// )
 
-router.patch(
-    "/"
-)
+// router.patch(
+//     "/"
+// )
 
-router.get(
-    "/:id",
-)
+// router.get(
+//     "/:id",
+// )
 
-router.delete(
+// router.delete(
     
-)
+// )
 export default router;

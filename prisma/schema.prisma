@@ -70,8 +70,8 @@ model Movie {
     id              Int      @id @default(autoincrement())
     image           String
     title           String
-    runtime         String
-    overview        String
+    runtime         Int
+    overview        String  @db.Text
     rating          Decimal
     price           Decimal
     release_date    DateTime
